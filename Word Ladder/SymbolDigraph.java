@@ -4,6 +4,7 @@ public class SymbolDigraph {
 	private ST<String, Integer> st;  // string -> index
 	private String[] keys;           // index  -> string
 	private Digraph G;
+	private BreadthFirstDirectedPaths bfs;
 
 	public SymbolDigraph(String filename, String delimiter) {
 		st = new ST<String, Integer>();
@@ -26,8 +27,8 @@ public class SymbolDigraph {
 			keys[st.get(name)] = name;
 		}
 
-		// second pass builds the graph by connecting first vertex on each
-		// line to all others
+		// second pass builds the graph by testing if they fit the word ladder description
+		// and adding the edge, if fitting
 		G = new Digraph(st.size());
 		for ( String v : st )
 			for ( String w : st )
@@ -50,6 +51,29 @@ public class SymbolDigraph {
 
 	public Digraph G() {
 		return G;
+	}
+	
+	// Returns the number of edges from the source s to the destination d
+	public int getPath(String s, String d) {
+		int sInd = index(s);
+		int dInd = index(d);
+		bfs = new BreadthFirstDirectedPaths(G, sInd);
+		if (bfs.hasPathTo(dInd))
+			return bfs.distTo(dInd);
+		else
+			return -1;
+	}
+	
+	@Override
+	public String toString() {
+		String s = G.V() + " " + G.E() + "\n";
+		for (String string : st) {
+			s += string + "\n";
+			int index = index(string);
+			for (int v : G.adj(index))
+				s += "    " + name(v) + "\n";
+		}
+		return s;
 	}
 
 
